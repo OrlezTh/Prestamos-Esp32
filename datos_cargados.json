@@ -1,0 +1,51 @@
+[
+    {
+        "Nombre": "thiago",
+        "Apellido": "alvarez",
+        "Prestado": 100000,
+        "IDcuota": 1,
+        "Cantidad_cuotas": 3,
+        "Monto_total": 300000,
+        "Cuota_monto": 100000,
+        "Cuotas": [
+            [
+                "Cuota: 1 Total: 100000 Pagado: False "
+            ],
+            [
+                "Cuota: 2 Total: 100000 Pagado: False "
+            ],
+            [
+                "Cuota: 3 Total: 100000 Pagado: False "
+            ]
+        ]
+    },
+    {
+        "Nombre": "\u00f1",
+        "Apellido": "o",
+        "Prestado": 200000,
+        "IDcuota": 1,
+        "Cantidad_cuotas": 6,
+        "Monto_total": 420000,
+        "Cuota_monto": 70000,
+        "Cuotas": [
+            [
+                "Cuota: 1 Total: 70000 Pagado: False"
+            ],
+            [
+                "Cuota: 2 Total: 70000 Pagado: False"
+            ],
+            [
+                "Cuota: 3 Total: 70000 Pagado: False"
+            ],
+            [
+                "Cuota: 4 Total: 70000 Pagado: False"
+            ],
+            [
+                "Cuota: 5 Total: 70000 Pagado: False"
+            ],
+            [
+                "Cuota: 6 Total: 70000 Pagado: False"
+            ]
+        ]
+    }
+]

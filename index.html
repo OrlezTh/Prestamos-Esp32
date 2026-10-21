@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Préstamos - Archivo Vintage</title>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Special+Elite&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #f4eee1;
+            color: #2c221e;
+            font-family: 'Courier Prime', Courier, monospace;
+            max-width: 750px;
+            margin: 40px auto;
+            padding: 20px;
+            border: 2px dashed #b59b75;
+            box-shadow: 5px 5px 0px rgba(181, 155, 117, 0.4);
+        }
+
+        h2 {
+            font-family: 'Special Elite', cursive, serif;
+            border-bottom: 2px solid #2c221e;
+            padding-bottom: 5px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        form {
+            background-color: #eae3d2;
+            padding: 20px;
+            border: 1px solid #b59b75;
+            margin-bottom: 30px;
+        }
+
+        input[type="text"], input[type="number"] {
+            background-color: #fffdf9;
+            border: 1px solid #8c7355;
+            padding: 8px;
+            font-family: 'Courier Prime', monospace;
+            color: #2c221e;
+            width: calc(100% - 20px);
+            margin-bottom: 12px;
+        }
+
+        button {
+            background-color: #2c221e;
+            color: #f4eee1;
+            border: none;
+            padding: 10px 15px;
+            font-family: 'Special Elite', cursive, serif;
+            cursor: pointer;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 2px 2px 0px #8c7355;
+        }
+
+        button:active {
+            transform: translate(2px, 2px);
+            box-shadow: none;
+        }
+
+        .refresh-btn {
+            background-color: #8c7355;
+            margin-bottom: 15px;
+        }
+
+        .prestamo-card {
+            background-color: #eae3d2;
+            border: 1px solid #8c7355;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 2px 2px 0px rgba(140, 115, 85, 0.3);
+        }
+
+        .prestamo-card h3 {
+            margin-top: 0;
+            font-family: 'Special Elite', cursive, serif;
+            border-bottom: 1px dashed #8c7355;
+            padding-bottom: 5px;
+        }
+
+        .cuota-item {
+            margin: 5px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="checkbox"] {
+            accent-color: #2c221e;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Registro de Préstamos</h2>
+    <form id="prestamoForm">
+        <input type="text" id="nombre" placeholder="Nombre del deudor" required>
+        <input type="text" id="apellido" placeholder="Apellido del deudor" required>
+        <input type="number" id="prestado" placeholder="Monto Prestado ($)" required>
+        <input type="number" id="cantidad_cuotas" placeholder="Cantidad de Cuotas" required>
+        <input type="number" id="cuota_monto" placeholder="Monto por Cuota ($)" required>
+        <button type="submit">Archivar Préstamo</button>
+    </form>
+
+    <h2>Libro de Legajos</h2>
+    <button class="refresh-btn" onclick="cargarPrestamos()">Actualizar Legajos</button>
+    <div id="contenedor-resultados">Cargando archivos...</div>
+
+    <script>
+        const API_URL = "http://127.0.0.1:8000";
+
+        document.getElementById("prestamoForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const data = {
+                nombre: document.getElementById("nombre").value,
+                apellido: document.getElementById("apellido").value,
+                prestado: parseInt(document.getElementById("prestado").value),
+                cantidad_cuotas: parseInt(document.getElementById("cantidad_cuotas").value),
+                cuota_monto: parseInt(document.getElementById("cuota_monto").value)
+            };
+
+            const response = await fetch(`${API_URL}/prestamos`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+
+            const resultado = await response.json();
+            alert(resultado.mensaje);
+            document.getElementById("prestamoForm").reset();
+            cargarPrestamos();
+        });
+
+        async function cargarPrestamos() {
+            try {
+                const response = await fetch(`${API_URL}/prestamos`);
+                const data = await response.json();
+                const contenedor = document.getElementById("contenedor-resultados");
+                
+                if (data.length === 0) {
+                    contenedor.innerHTML = "<p>No hay registros archivados.</p>";
+                    return;
+                }
+
+                let html = "";
+                data.forEach((p, pIndex) => {
+                    html += `
+                        <div class="prestamo-card">
+                            <h3>Deudor: ${p.Nombre} ${p.Apellido}</h3>
+                            <p><strong>Monto Prestado:</strong> $${p.Prestado} | <strong>Total a Cobrar:</strong> $${p.Monto_total}</p>
+                            <p><strong>Desglose de Cuotas (Tuplas):</strong></p>
+                    `;
+
+                    p.Cuotas.forEach((cuotaTuple, cIndex) => {
+                        // Extrae el texto de la tupla
+                        const textoCuota = Array.isArray(cuotaTuple) ? cuotaTuple[0] : cuotaTuple;
+                        const estaPagado = textoCuota.includes("Pagado: True");
+
+                        html += `
+                            <div class="cuota-item">
+                                <input type="checkbox" ${estaPagado ? "checked" : ""} 
+                                    onchange="togglePago(${pIndex}, ${cIndex})">
+                                <span>(${textoCuota})</span>
+                            </div>
+                        `;
+                    });
+
+                    html += `</div>`;
+                });
+
+                contenedor.innerHTML = html;
+            } catch (error) {
+                document.getElementById("contenedor-resultados").textContent = "Error al conectar con el archivo central.";
+            }
+        }
+
+        async function togglePago(pIndex, cIndex) {
+            await fetch(`${API_URL}/prestamos/${pIndex}/cuota/${cIndex}`, {
+                method: "PUT"
+            });
+            cargarPrestamos();
+        }
+
+        cargarPrestamos();
+    </script>
+</body>
+</html>
