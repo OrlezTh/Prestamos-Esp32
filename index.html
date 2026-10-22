@@ -2,186 +2,704 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Gestión de Préstamos - Archivo Vintage</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Préstamos actuales</title>
     <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Special+Elite&display=swap" rel="stylesheet">
-    
+
     <style>
+        :root {
+            --fondo: #181c1b;
+            --panel: #212725;
+            --panel-2: #2a312e;
+            --borde: #3d4743;
+            --texto: #e2ded2;
+            --texto-suave: #a39f92;
+            --laton: #c9a96b;
+            --pagado: #86b894;
+            --pendiente: #d9a05f;
+            --peligro: #c96f62;
+        }
+
+        * { box-sizing: border-box; }
+
         body {
-            background-color: #f4eee1;
-            color: #2c221e;
+            background-color: var(--fondo);
+            color: var(--texto);
             font-family: 'Courier Prime', Courier, monospace;
-            max-width: 750px;
-            margin: 40px auto;
-            padding: 20px;
-            border: 2px dashed #b59b75;
-            box-shadow: 5px 5px 0px rgba(181, 155, 117, 0.4);
+            max-width: 1100px;
+            margin: 32px auto;
+            padding: 0 20px 60px;
+            line-height: 1.5;
         }
 
         h2 {
             font-family: 'Special Elite', cursive, serif;
-            border-bottom: 2px solid #2c221e;
-            padding-bottom: 5px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
+            font-weight: 400;
+            font-size: 1.5rem;
+            border-bottom: 1px solid var(--borde);
+            padding-bottom: 8px;
+            margin: 36px 0 18px;
+            color: var(--laton);
         }
 
-        form {
-            background-color: #eae3d2;
-            padding: 20px;
-            border: 1px solid #b59b75;
-            margin-bottom: 30px;
+        /* ---------- Formularios ---------- */
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            background-color: var(--fondo);
+            border: 1px solid var(--borde);
+            border-radius: 3px;
+            padding: 10px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            color: var(--texto);
+        }
+        input::placeholder { color: var(--texto-suave); }
+        select { cursor: pointer; }
+        input:focus-visible, select:focus-visible, button:focus-visible, summary:focus-visible {
+            outline: 2px solid var(--laton);
+            outline-offset: 2px;
         }
 
-        input[type="text"], input[type="number"] {
-            background-color: #fffdf9;
-            border: 1px solid #8c7355;
-            padding: 8px;
-            font-family: 'Courier Prime', monospace;
-            color: #2c221e;
-            width: calc(100% - 20px);
-            margin-bottom: 12px;
+        label.campo {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--texto-suave);
+            margin-bottom: 4px;
         }
 
+        /* Formulario de alta (siempre visible, compacto) */
+        .nuevo {
+            background-color: var(--panel);
+            border: 1px solid var(--borde);
+            border-radius: 4px;
+            padding: 12px 14px 14px;
+        }
+        .nuevo .titulo {
+            font-family: 'Special Elite', cursive, serif;
+            color: var(--laton);
+            margin: 0 0 10px;
+            font-size: 1.05rem;
+        }
+        form.registro {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 10px;
+            align-items: end;
+        }
+        @media (max-width: 1000px) {
+            form.registro { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            form.registro .btn { grid-column: 1 / -1; }
+        }
+        @media (max-width: 560px) {
+            form.registro { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        form.registro input, form.registro select { padding: 7px 9px; font-size: 0.9rem; }
+        form.registro label.campo { font-size: 0.78rem; margin-bottom: 2px; }
+        form.registro button { width: 100%; padding: 8px 14px; }
+
+        /* ---------- Botones ---------- */
         button {
-            background-color: #2c221e;
-            color: #f4eee1;
+            background-color: var(--laton);
+            color: #1c1a14;
             border: none;
-            padding: 10px 15px;
+            border-radius: 3px;
+            padding: 9px 14px;
             font-family: 'Special Elite', cursive, serif;
+            font-size: 0.9rem;
             cursor: pointer;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            box-shadow: 2px 2px 0px #8c7355;
+        }
+        button:hover { filter: brightness(1.08); }
+        button:active { transform: translateY(1px); }
+
+        button.sec {
+            background-color: transparent;
+            color: var(--texto);
+            border: 1px solid var(--borde);
+        }
+        button.sec:hover { border-color: var(--laton); color: var(--laton); filter: none; }
+
+        button.peligro {
+            background-color: transparent;
+            color: var(--peligro);
+            border: 1px solid var(--peligro);
+        }
+        button.peligro:hover { background-color: var(--peligro); color: #1c1a14; filter: none; }
+
+        button.chico { padding: 4px 9px; font-size: 0.8rem; }
+
+        /* ---------- Cobros del mes ---------- */
+        #panel-mes {
+            background-color: var(--panel);
+            border: 1px solid var(--borde);
+            border-radius: 4px;
+            padding: 16px 18px;
+        }
+        .panel-top {
+            display: grid;
+            grid-template-columns: 190px 1fr;
+            gap: 16px;
+            align-items: end;
+            margin-bottom: 14px;
+        }
+        .panel-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+        @media (max-width: 640px) {
+            .panel-top { grid-template-columns: 1fr; }
         }
 
-        button:active {
-            transform: translate(2px, 2px);
-            box-shadow: none;
-        }
+        .lista-mes { display: grid; grid-template-columns: 1fr; gap: 0 28px; }
+        @media (min-width: 900px) { .lista-mes { grid-template-columns: 1fr 1fr; } }
 
-        .refresh-btn {
-            background-color: #8c7355;
-            margin-bottom: 15px;
+        .item-mes {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 10px;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--borde);
         }
+        .item-mes .quien { text-transform: capitalize; }
+        .item-mes small { display: block; color: var(--texto-suave); font-size: 0.8rem; }
+        .item-mes.hecho { opacity: 0.6; }
+        .item-mes.hecho .monto { text-decoration: line-through; }
 
-        .prestamo-card {
-            background-color: #eae3d2;
-            border: 1px solid #8c7355;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 2px 2px 0px rgba(140, 115, 85, 0.3);
+        /* ---------- Listado de deudores: 2 columnas ---------- */
+        #contenedor-resultados {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+            align-items: start; /* cada tarjeta con su propio alto */
         }
-
-        .prestamo-card h3 {
-            margin-top: 0;
-            font-family: 'Special Elite', cursive, serif;
-            border-bottom: 1px dashed #8c7355;
-            padding-bottom: 5px;
+        @media (min-width: 900px) {
+            #contenedor-resultados { grid-template-columns: 1fr 1fr; }
         }
+        #contenedor-resultados > .vacio, #contenedor-resultados > .mensaje { grid-column: 1 / -1; }
 
-        .cuota-item {
-            margin: 5px 0;
+        /* ---------- Tarjeta colapsable ---------- */
+        details.prestamo-card {
+            background-color: var(--panel);
+            border: 1px solid var(--borde);
+            border-radius: 4px;
+        }
+        details.prestamo-card[open] { border-color: var(--laton); }
+
+        details.prestamo-card > summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 14px 16px;
+        }
+        details.prestamo-card > summary::-webkit-details-marker { display: none; }
+        details.prestamo-card > summary:hover { background-color: var(--panel-2); }
+
+        .res-top {
             display: flex;
             align-items: center;
             gap: 10px;
         }
+        .chev { color: var(--laton); transition: transform 0.15s; display: inline-block; width: 1em; }
+        .chev::before { content: "▸"; }
+        details[open] > summary .chev { transform: rotate(90deg); }
+
+        .res-top h3 {
+            margin: 0;
+            flex: 1;
+            font-family: 'Special Elite', cursive, serif;
+            font-weight: 400;
+            font-size: 1.15rem;
+            text-transform: capitalize;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .badge {
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            border: 1px solid var(--borde);
+            color: var(--texto-suave);
+            white-space: nowrap;
+        }
+        .badge.saldado { color: var(--pagado); border-color: var(--pagado); }
+
+        .res-mini {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 4px 14px;
+            margin: 8px 0 8px 1.7em;
+            font-size: 0.88rem;
+            color: var(--texto-suave);
+        }
+        .res-mini strong { color: var(--texto); }
+        .res-mini .falta strong { color: var(--pendiente); }
+
+        .barra {
+            height: 5px;
+            background-color: var(--fondo);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-left: 1.7em;
+        }
+        .barra div { height: 100%; background-color: var(--pagado); }
+
+        .cuerpo { padding: 4px 16px 16px; border-top: 1px dashed var(--borde); }
+
+        .acciones { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0 12px; }
+
+        .datos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .dato {
+            background-color: var(--panel-2);
+            border-radius: 3px;
+            padding: 8px 10px;
+        }
+        .dato span { display: block; font-size: 0.8rem; color: var(--texto-suave); }
+        .dato strong { font-size: 1.05rem; }
+        .dato.ok strong { color: var(--pagado); }
+        .dato.falta strong { color: var(--pendiente); }
+
+        /* ---------- Tabla de cuotas ---------- */
+        .tabla-wrap { overflow-x: auto; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+        th {
+            text-align: left;
+            font-weight: 400;
+            color: var(--texto-suave);
+            font-size: 0.8rem;
+            border-bottom: 1px solid var(--borde);
+            padding: 6px 8px;
+        }
+        td { padding: 8px; border-bottom: 1px dashed var(--borde); vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        td.num, th.num { text-align: right; }
+
+        .estado { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+        .estado.pagada { color: var(--pagado); }
+        .estado.pendiente { color: var(--pendiente); }
 
         input[type="checkbox"] {
-            accent-color: #2c221e;
-            width: 16px;
-            height: 16px;
+            accent-color: var(--pagado);
+            width: 17px;
+            height: 17px;
             cursor: pointer;
         }
+
+        tr.fila-pagada td:not(.acc) { opacity: 0.7; }
+        td.acc { text-align: right; white-space: nowrap; }
+        td.acc button + button { margin-left: 4px; }
+
+        .vacio { color: var(--texto-suave); padding: 12px 0; }
+
+        /* ---------- Modal ---------- */
+        dialog {
+            background-color: var(--panel);
+            color: var(--texto);
+            border: 1px solid var(--laton);
+            border-radius: 4px;
+            padding: 22px;
+            width: min(420px, 92vw);
+            font-family: 'Courier Prime', monospace;
+        }
+        dialog::backdrop { background: rgba(0, 0, 0, 0.65); }
+        dialog h3 {
+            margin: 0 0 14px;
+            font-family: 'Special Elite', cursive, serif;
+            font-weight: 400;
+            color: var(--laton);
+        }
+        dialog .campo-modal { margin-bottom: 12px; }
+        dialog .botones { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+
     </style>
 </head>
 <body>
 
-    <h2>Registro de Préstamos</h2>
-    <form id="prestamoForm">
-        <input type="text" id="nombre" placeholder="Nombre del deudor" required>
-        <input type="text" id="apellido" placeholder="Apellido del deudor" required>
-        <input type="number" id="prestado" placeholder="Monto Prestado ($)" required>
-        <input type="number" id="cantidad_cuotas" placeholder="Cantidad de Cuotas" required>
-        <input type="number" id="cuota_monto" placeholder="Monto por Cuota ($)" required>
-        <button type="submit">Archivar Préstamo</button>
-    </form>
+    <section class="nuevo">
+        <p class="titulo">Registrar nuevo préstamo</p>
+        <form id="prestamoForm" class="registro">
+            <div>
+                <label class="campo" for="nombre">Nombre</label>
+                <input type="text" id="nombre" required>
+            </div>
+            <div>
+                <label class="campo" for="apellido">Apellido</label>
+                <input type="text" id="apellido" required>
+            </div>
+            <div>
+                <label class="campo" for="prestado">Monto prestado ($)</label>
+                <input type="number" id="prestado" min="0" required>
+            </div>
+            <div>
+                <label class="campo" for="cantidad_cuotas">Cantidad de cuotas</label>
+                <input type="number" id="cantidad_cuotas" min="1" required>
+            </div>
+            <div>
+                <label class="campo" for="cuota_monto">Monto por cuota ($)</label>
+                <input type="number" id="cuota_monto" min="0" required>
+            </div>
+            <div>
+                <label class="campo" for="mes_inicial">Mes 1ª cuota</label>
+                <select id="mes_inicial" required></select>
+            </div>
+            <div class="btn">
+                <button type="submit">Guardar</button>
+            </div>
+        </form>
+    </section>
 
-    <h2>Libro de Legajos</h2>
-    <button class="refresh-btn" onclick="cargarPrestamos()">Actualizar Legajos</button>
-    <div id="contenedor-resultados">Cargando archivos...</div>
+    <h2>Cobros del mes</h2>
+    <section id="panel-mes">
+        <div class="panel-top">
+            <div class="selector">
+                <label class="campo" for="mesPanel">Mes</label>
+                <select id="mesPanel"></select>
+            </div>
+            <div class="panel-stats" id="panel-stats"></div>
+        </div>
+        <div id="panel-lista" class="lista-mes"></div>
+    </section>
+
+    <h2>Préstamos actuales</h2>
+    <div id="contenedor-resultados"><p class="mensaje">Cargando…</p></div>
+
+    <dialog id="modal">
+        <form id="modalForm" method="dialog">
+            <h3 id="modalTitulo"></h3>
+            <div id="modalCampos"></div>
+            <div class="botones">
+                <button type="button" class="sec" id="modalCancelar">Cancelar</button>
+                <button type="submit">Guardar</button>
+            </div>
+        </form>
+    </dialog>
 
     <script>
         const API_URL = "http://127.0.0.1:8000";
 
-        document.getElementById("prestamoForm").addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const data = {
-                nombre: document.getElementById("nombre").value,
-                apellido: document.getElementById("apellido").value,
-                prestado: parseInt(document.getElementById("prestado").value),
-                cantidad_cuotas: parseInt(document.getElementById("cantidad_cuotas").value),
-                cuota_monto: parseInt(document.getElementById("cuota_monto").value)
-            };
+        const $ = (id) => document.getElementById(id);
+        const plata = (n) => "$" + Number(n).toLocaleString("es-AR");
+        const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({
+            "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+        }[c]));
 
-            const response = await fetch(`${API_URL}/prestamos`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data)
-            });
+        const MESES = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                       "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        const OPCIONES_MES = MESES.map((m, i) => ({ v: i + 1, t: m }));
+        const nombreMes = (n) => (n ? MESES[n - 1] : "—");
+        const mesActual = () => new Date().getMonth() + 1;
+        const htmlOpcionesMes = OPCIONES_MES.map(o => `<option value="${o.v}">${o.t}</option>`).join("");
 
-            const resultado = await response.json();
-            alert(resultado.mensaje);
-            document.getElementById("prestamoForm").reset();
-            cargarPrestamos();
-        });
+        $("mes_inicial").innerHTML = htmlOpcionesMes;
+        $("mes_inicial").value = mesActual();
 
-        async function cargarPrestamos() {
-            try {
-                const response = await fetch(`${API_URL}/prestamos`);
-                const data = await response.json();
-                const contenedor = document.getElementById("contenedor-resultados");
-                
-                if (data.length === 0) {
-                    contenedor.innerHTML = "<p>No hay registros archivados.</p>";
-                    return;
-                }
+        // ---------- Estado de la interfaz ----------
+        let datosCache = [];
+        let mesPanel = mesActual();
+        let abiertos = new Set();
+        try { abiertos = new Set(JSON.parse(localStorage.getItem("prestamos_abiertos") || "[]")); } catch (_) {}
 
-                let html = "";
-                data.forEach((p, pIndex) => {
-                    html += `
-                        <div class="prestamo-card">
-                            <h3>Deudor: ${p.Nombre} ${p.Apellido}</h3>
-                            <p><strong>Monto Prestado:</strong> $${p.Prestado} | <strong>Total a Cobrar:</strong> $${p.Monto_total}</p>
-                            <p><strong>Desglose de Cuotas (Tuplas):</strong></p>
-                    `;
-
-                    p.Cuotas.forEach((cuotaTuple, cIndex) => {
-                        // Extrae el texto de la tupla
-                        const textoCuota = Array.isArray(cuotaTuple) ? cuotaTuple[0] : cuotaTuple;
-                        const estaPagado = textoCuota.includes("Pagado: True");
-
-                        html += `
-                            <div class="cuota-item">
-                                <input type="checkbox" ${estaPagado ? "checked" : ""} 
-                                    onchange="togglePago(${pIndex}, ${cIndex})">
-                                <span>(${textoCuota})</span>
-                            </div>
-                        `;
-                    });
-
-                    html += `</div>`;
-                });
-
-                contenedor.innerHTML = html;
-            } catch (error) {
-                document.getElementById("contenedor-resultados").textContent = "Error al conectar con el archivo central.";
-            }
+        function guardarAbiertos() {
+            try { localStorage.setItem("prestamos_abiertos", JSON.stringify([...abiertos])); } catch (_) {}
         }
 
-        async function togglePago(pIndex, cIndex) {
-            await fetch(`${API_URL}/prestamos/${pIndex}/cuota/${cIndex}`, {
-                method: "PUT"
+        // 'toggle' no burbujea: se escucha en fase de captura
+        $("contenedor-resultados").addEventListener("toggle", (e) => {
+            const d = e.target;
+            if (!d.matches || !d.matches("details.prestamo-card")) return;
+            if (d.open) abiertos.add(d.dataset.id); else abiertos.delete(d.dataset.id);
+            guardarAbiertos();
+        }, true);
+
+        $("mesPanel").innerHTML = htmlOpcionesMes;
+        $("mesPanel").value = mesPanel;
+        $("mesPanel").addEventListener("change", (e) => {
+            mesPanel = parseInt(e.target.value);
+            renderPanel();
+        });
+
+        async function api(ruta, metodo = "GET", cuerpo) {
+            const opciones = { method: metodo, headers: {} };
+            if (cuerpo !== undefined) {
+                opciones.headers["Content-Type"] = "application/json";
+                opciones.body = JSON.stringify(cuerpo);
+            }
+            const r = await fetch(`${API_URL}${ruta}`, opciones);
+            if (!r.ok) {
+                let detalle = "Error en el servidor";
+                try { detalle = (await r.json()).detail || detalle; } catch (_) {}
+                throw new Error(detalle);
+            }
+            return r.json();
+        }
+
+        // ---------- Alta de préstamo ----------
+        $("prestamoForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            try {
+                await api("/prestamos", "POST", {
+                    nombre: $("nombre").value,
+                    apellido: $("apellido").value,
+                    prestado: parseInt($("prestado").value),
+                    cantidad_cuotas: parseInt($("cantidad_cuotas").value),
+                    cuota_monto: parseInt($("cuota_monto").value),
+                    mes_inicial: parseInt($("mes_inicial").value)
+                });
+                e.target.reset();
+                $("mes_inicial").value = mesActual();
+                cargarPrestamos();
+            } catch (err) {
+                alert(err.message);
+            }
+        });
+
+        // ---------- Carga y render ----------
+        async function cargarPrestamos() {
+            const contenedor = $("contenedor-resultados");
+            try {
+                datosCache = await api("/prestamos");
+            } catch (error) {
+                contenedor.innerHTML = '<p class="mensaje">No se pudo conectar con el servidor. ¿Está corriendo uvicorn?</p>';
+                return;
+            }
+
+            renderPanel();
+
+            if (datosCache.length === 0) {
+                contenedor.innerHTML = '<p class="vacio">No hay préstamos cargados. Agregá el primero desde el formulario de arriba.</p>';
+                return;
+            }
+            contenedor.innerHTML = datosCache.map(tarjeta).join("");
+        }
+
+        // ---------- Cobros del mes ----------
+        function renderPanel() {
+            const items = [];
+            datosCache.forEach(p => p.Cuotas.forEach((c, i) => {
+                if (c.Mes === mesPanel) items.push({ p, c, i });
+            }));
+
+            items.sort((a, b) =>
+                Number(a.c.Pagado) - Number(b.c.Pagado) ||
+                (a.p.Apellido + a.p.Nombre).localeCompare(b.p.Apellido + b.p.Nombre));
+
+            const pend = items.filter(x => !x.c.Pagado);
+            const hechas = items.filter(x => x.c.Pagado);
+            const sumPend = pend.reduce((s, x) => s + x.c.Total, 0);
+            const sumHecho = hechas.reduce((s, x) => s + x.c.Total, 0);
+
+            $("panel-stats").innerHTML = `
+                <div class="dato falta"><span>A cobrar en ${nombreMes(mesPanel)}</span><strong>${plata(sumPend)}</strong></div>
+                <div class="dato ok"><span>Ya cobrado</span><strong>${plata(sumHecho)}</strong></div>
+                <div class="dato"><span>Cuotas pendientes</span><strong>${pend.length} de ${items.length}</strong></div>
+            `;
+
+            $("panel-lista").innerHTML = items.length === 0
+                ? '<p class="vacio">No hay cuotas asignadas a este mes.</p>'
+                : items.map(({ p, c, i }) => `
+                    <div class="item-mes ${c.Pagado ? "hecho" : ""}">
+                        <input type="checkbox" ${c.Pagado ? "checked" : ""}
+                            aria-label="Marcar cuota ${c.Cuota} de ${esc(p.Nombre)} ${esc(p.Apellido)} como pagada"
+                            onchange="togglePago('${p.id}', ${i})">
+                        <div class="quien">${esc(p.Nombre)} ${esc(p.Apellido)}
+                            <small>Cuota ${c.Cuota} de ${p.Cantidad_cuotas}</small>
+                        </div>
+                        <strong class="monto">${plata(c.Total)}</strong>
+                    </div>
+                `).join("");
+        }
+
+        // ---------- Tarjeta de deudor ----------
+        function tarjeta(p) {
+            const pagado = p.Cuotas.filter(c => c.Pagado).reduce((s, c) => s + c.Total, 0);
+            const pendiente = p.Monto_total - pagado;
+            const cuotasPagas = p.Cuotas.filter(c => c.Pagado).length;
+            const porcentaje = p.Monto_total > 0 ? Math.round(pagado / p.Monto_total * 100) : 0;
+            const saldado = p.Cuotas.length > 0 && cuotasPagas === p.Cuotas.length;
+            const proxima = p.Cuotas.find(c => !c.Pagado);
+
+            const filas = p.Cuotas.map((c, i) => `
+                <tr class="${c.Pagado ? "fila-pagada" : ""}">
+                    <td>${c.Cuota}</td>
+                    <td>${nombreMes(c.Mes)}</td>
+                    <td class="num">${plata(c.Total)}</td>
+                    <td>
+                        <label class="estado ${c.Pagado ? "pagada" : "pendiente"}">
+                            <input type="checkbox" ${c.Pagado ? "checked" : ""}
+                                onchange="togglePago('${p.id}', ${i})">
+                            ${c.Pagado ? "Pagada" : "Pendiente"}
+                        </label>
+                    </td>
+                    <td class="acc">
+                        <button class="sec chico" onclick="editarCuota('${p.id}', ${i}, ${c.Total}, ${c.Mes ?? "null"})">Editar</button>
+                        <button class="peligro chico" onclick="borrarCuota('${p.id}', ${i}, ${c.Cuota})">Borrar</button>
+                    </td>
+                </tr>
+            `).join("");
+
+            const ultimaMes = p.Cuotas.length ? p.Cuotas[p.Cuotas.length - 1].Mes : null;
+            const mesSugerido = ultimaMes ? ultimaMes % 12 + 1 : "null";
+
+            return `
+                <details class="prestamo-card" data-id="${p.id}" ${abiertos.has(p.id) ? "open" : ""}>
+                    <summary>
+                        <div class="res-top">
+                            <span class="chev" aria-hidden="true"></span>
+                            <h3>${esc(p.Nombre)} ${esc(p.Apellido)}</h3>
+                            <span class="badge ${saldado ? "saldado" : ""}">${saldado ? "Saldado" : `${cuotasPagas}/${p.Cantidad_cuotas} cuotas`}</span>
+                        </div>
+                        <div class="res-mini">
+                            <span class="falta">Falta <strong>${plata(pendiente)}</strong></span>
+                            <span>Próxima: <strong>${saldado ? "—" : nombreMes(proxima?.Mes)}</strong></span>
+                        </div>
+                        <div class="barra" title="${porcentaje}% cobrado"><div style="width:${porcentaje}%"></div></div>
+                    </summary>
+
+                    <div class="cuerpo">
+                        <div class="acciones">
+                            <button class="chico" onclick="agregarCuota('${p.id}', ${p.Cuota_monto}, ${mesSugerido})">Agregar cuota</button>
+                            <button class="sec chico" onclick="editarDeudor('${p.id}')">Editar deudor</button>
+                            <button class="peligro chico" onclick="borrarDeudor('${p.id}')">Borrar deudor</button>
+                        </div>
+
+                        <div class="datos">
+                            <div class="dato"><span>Prestado</span><strong>${plata(p.Prestado)}</strong></div>
+                            <div class="dato"><span>Total a cobrar</span><strong>${plata(p.Monto_total)}</strong></div>
+                            <div class="dato ok"><span>Cobrado</span><strong>${plata(pagado)}</strong></div>
+                            <div class="dato falta"><span>Falta cobrar</span><strong>${plata(pendiente)}</strong></div>
+                        </div>
+
+                        ${p.Cuotas.length === 0
+                            ? '<p class="vacio">Sin cuotas. Usá "Agregar cuota".</p>'
+                            : `<div class="tabla-wrap">
+                                <table>
+                                    <thead>
+                                        <tr><th>Cuota</th><th>Mes</th><th class="num">Monto</th><th>Estado</th><th></th></tr>
+                                    </thead>
+                                    <tbody>${filas}</tbody>
+                                </table>
+                               </div>`}
+                    </div>
+                </details>
+            `;
+        }
+
+        // ---------- Modal reutilizable ----------
+        let accionModal = null;
+
+        function abrirModal(titulo, campos, alGuardar) {
+            $("modalTitulo").textContent = titulo;
+            $("modalCampos").innerHTML = campos.map(c => {
+                const control = c.tipo === "select"
+                    ? `<select id="m_${c.id}" ${c.opciones.some(o => o.v === "") ? "" : "required"}>${c.opciones.map(o =>
+                        `<option value="${o.v}" ${String(o.v) === String(c.valor) ? "selected" : ""}>${o.t}</option>`
+                      ).join("")}</select>`
+                    : `<input id="m_${c.id}" type="${c.tipo}" value="${esc(c.valor ?? "")}" ${c.tipo === "number" ? 'min="0"' : ""} required>`;
+                return `
+                    <div class="campo-modal">
+                        <label class="campo" for="m_${c.id}">${c.label}</label>
+                        ${control}
+                    </div>`;
+            }).join("");
+            accionModal = async () => {
+                const valores = {};
+                campos.forEach(c => {
+                    const v = $("m_" + c.id).value;
+                    valores[c.id] = (c.tipo === "number" || c.tipo === "select") ? parseInt(v) : v;
+                });
+                await alGuardar(valores);
+            };
+            $("modal").showModal();
+        }
+
+        $("modalCancelar").addEventListener("click", () => $("modal").close());
+
+        $("modalForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            try {
+                await accionModal();
+                $("modal").close();
+                cargarPrestamos();
+            } catch (err) {
+                alert(err.message);
+            }
+        });
+
+        // ---------- Acciones ----------
+        async function togglePago(id, idx) {
+            try {
+                await api(`/prestamos/${id}/cuotas/${idx}/pago`, "PATCH");
+            } catch (err) {
+                alert(err.message);
+            }
+            cargarPrestamos();
+        }
+
+        function agregarCuota(id, montoSugerido, mesSugerido) {
+            abrirModal("Agregar cuota", [
+                { id: "monto", label: "Monto de la cuota ($)", tipo: "number", valor: montoSugerido },
+                { id: "mes", label: "Mes de cobro", tipo: "select", opciones: OPCIONES_MES,
+                  valor: mesSugerido ?? mesActual() }
+            ], (v) => api(`/prestamos/${id}/cuotas`, "POST", { monto: v.monto, mes: v.mes }));
+        }
+
+        function editarCuota(id, idx, montoActual, mesDeCuota) {
+            abrirModal("Editar cuota", [
+                { id: "monto", label: "Monto de la cuota ($)", tipo: "number", valor: montoActual },
+                { id: "mes", label: "Mes de cobro", tipo: "select",
+                  opciones: mesDeCuota ? OPCIONES_MES : [{ v: "", t: "Sin definir" }, ...OPCIONES_MES],
+                  valor: mesDeCuota }
+            ], (v) => api(`/prestamos/${id}/cuotas/${idx}`, "PUT", { monto: v.monto, mes: v.mes }));
+        }
+
+        async function borrarCuota(id, idx, numero) {
+            if (!confirm(`¿Borrar la cuota ${numero}?`)) return;
+            try {
+                await api(`/prestamos/${id}/cuotas/${idx}`, "DELETE");
+            } catch (err) {
+                alert(err.message);
+            }
+            cargarPrestamos();
+        }
+
+        function editarDeudor(id) {
+            const p = datosCache.find(x => x.id === id);
+            if (!p) return;
+            const mesOriginal = p.Cuotas[0]?.Mes ?? null;
+            abrirModal("Editar deudor", [
+                { id: "nombre", label: "Nombre", tipo: "text", valor: p.Nombre },
+                { id: "apellido", label: "Apellido", tipo: "text", valor: p.Apellido },
+                { id: "prestado", label: "Monto prestado ($)", tipo: "number", valor: p.Prestado },
+                { id: "cuota_monto", label: "Monto por cuota ($, solo cuotas pendientes)", tipo: "number", valor: p.Cuota_monto },
+                { id: "mes_inicial", label: "Mes de la primera cuota (si lo cambiás, reasigna el mes de todas)", tipo: "select",
+                  opciones: mesOriginal ? OPCIONES_MES : [{ v: "", t: "Sin definir" }, ...OPCIONES_MES],
+                  valor: mesOriginal }
+            ], (v) => {
+                // solo se manda si el usuario lo cambió; si no, no se tocan los meses
+                if (v.mes_inicial === mesOriginal || Number.isNaN(v.mes_inicial)) delete v.mes_inicial;
+                return api(`/prestamos/${id}`, "PUT", v);
             });
+        }
+
+        async function borrarDeudor(id) {
+            const p = datosCache.find(x => x.id === id);
+            const nombre = p ? `${p.Nombre} ${p.Apellido}` : "este deudor";
+            if (!confirm(`¿Borrar a ${nombre} y todas sus cuotas? No se puede deshacer.`)) return;
+            try {
+                await api(`/prestamos/${id}`, "DELETE");
+                abiertos.delete(id);
+                guardarAbiertos();
+            } catch (err) {
+                alert(err.message);
+            }
             cargarPrestamos();
         }
 
