@@ -295,6 +295,7 @@
 
         tr.fila-pagada td:not(.acc) { opacity: 0.7; }
         td.acc { text-align: right; white-space: nowrap; }
+        td.coment { color: var(--texto-suave); font-size: 0.85rem; max-width: 220px; overflow-wrap: anywhere; }
         td.acc button + button { margin-left: 4px; }
 
         .vacio { color: var(--texto-suave); padding: 12px 0; }
@@ -538,7 +539,9 @@
                             ${c.Pagado ? "Pagada" : "Pendiente"}
                         </label>
                     </td>
+                    <td class="coment">${esc(c.Comentario || "")}</td>
                     <td class="acc">
+                        <button class="sec chico" onclick="comentarCuota('${p.id}', ${i})">${c.Comentario ? "Comentario" : "+ Comentario"}</button>
                         <button class="sec chico" onclick="editarCuota('${p.id}', ${i}, ${c.Total}, ${c.Mes ?? "null"})">Editar</button>
                         <button class="peligro chico" onclick="borrarCuota('${p.id}', ${i}, ${c.Cuota})">Borrar</button>
                     </td>
@@ -582,7 +585,7 @@
                             : `<div class="tabla-wrap">
                                 <table>
                                     <thead>
-                                        <tr><th>Cuota</th><th>Mes</th><th class="num">Monto</th><th>Estado</th><th></th></tr>
+                                        <tr><th>Cuota</th><th>Mes</th><th class="num">Monto</th><th>Estado</th><th>Comentario</th><th></th></tr>
                                     </thead>
                                     <tbody>${filas}</tbody>
                                 </table>
@@ -602,7 +605,7 @@
                     ? `<select id="m_${c.id}" ${c.opciones.some(o => o.v === "") ? "" : "required"}>${c.opciones.map(o =>
                         `<option value="${o.v}" ${String(o.v) === String(c.valor) ? "selected" : ""}>${o.t}</option>`
                       ).join("")}</select>`
-                    : `<input id="m_${c.id}" type="${c.tipo}" value="${esc(c.valor ?? "")}" ${c.tipo === "number" ? 'min="0"' : ""} required>`;
+                    : `<input id="m_${c.id}" type="${c.tipo}" value="${esc(c.valor ?? "")}" ${c.tipo === "number" ? 'min="0"' : ""} ${c.opcional ? "" : "required"}>`;
                 return `
                     <div class="campo-modal">
                         <label class="campo" for="m_${c.id}">${c.label}</label>
@@ -658,6 +661,14 @@
                   opciones: mesDeCuota ? OPCIONES_MES : [{ v: "", t: "Sin definir" }, ...OPCIONES_MES],
                   valor: mesDeCuota }
             ], (v) => api(`/prestamos/${id}/cuotas/${idx}`, "PUT", { monto: v.monto, mes: v.mes }));
+        }
+
+        function comentarCuota(id, idx) {
+            const c = datosCache.find(x => x.id === id)?.Cuotas[idx];
+            if (!c) return;
+            abrirModal(`Comentario de la cuota ${c.Cuota}`, [
+                { id: "comentario", label: "Comentario (vacío para borrarlo)", tipo: "text", valor: c.Comentario || "", opcional: true }
+            ], (v) => api(`/prestamos/${id}/cuotas/${idx}/comentario`, "PATCH", { comentario: v.comentario }));
         }
 
         async function borrarCuota(id, idx, numero) {

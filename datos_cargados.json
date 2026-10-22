@@ -28,7 +28,8 @@
                 "Cuota": 4,
                 "Total": 105000,
                 "Pagado": false,
-                "Mes": 10
+                "Mes": 10,
+                "Comentario": "Paga a fin de mes"
             }
         ],
         "Cantidad_cuotas": 4,
@@ -121,7 +122,8 @@
                 "Cuota": 1,
                 "Total": 269000,
                 "Pagado": false,
-                "Mes": 10
+                "Mes": 10,
+                "Comentario": "No paga el mes de octubre"
             },
             {
                 "Cuota": 2,
@@ -191,7 +193,8 @@
                 "Cuota": 1,
                 "Total": 450000,
                 "Pagado": false,
-                "Mes": 10
+                "Mes": 10,
+                "Comentario": "Mes que viene o fines de octubre"
             }
         ],
         "Cantidad_cuotas": 1,

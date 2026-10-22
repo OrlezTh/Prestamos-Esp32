@@ -55,6 +55,10 @@ class CuotaEditar(BaseModel):
     mes: Optional[int] = None
 
 
+class CuotaComentario(BaseModel):
+    comentario: str = ""
+
+
 # ---------- Persistencia ----------
 
 PATRON_VIEJO = re.compile(r"Cuota:\s*(\d+)\s+Total:\s*(\d+)\s+Pagado:\s*(True|False)")
@@ -243,6 +247,16 @@ def alternar_pago(prestamo_id: str, cuota_idx: int):
     c["Pagado"] = not c["Pagado"]
     guardar(datos)
     return {"mensaje": "Estado de cuota actualizado", "Pagado": c["Pagado"]}
+
+
+@app.patch("/prestamos/{prestamo_id}/cuotas/{cuota_idx}/comentario")
+def comentar_cuota(prestamo_id: str, cuota_idx: int, datos_comentario: CuotaComentario):
+    datos = cargar()
+    p = buscar(datos, prestamo_id)
+    c = validar_cuota(p, cuota_idx)
+    c["Comentario"] = datos_comentario.comentario.strip()
+    guardar(datos)
+    return {"mensaje": "Comentario actualizado", "Comentario": c["Comentario"]}
 
 
 @app.put("/prestamos/{prestamo_id}/cuotas/{cuota_idx}")
