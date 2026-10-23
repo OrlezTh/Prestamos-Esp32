@@ -1,9 +1,0 @@
-{
-    "chat.editor.preferCopilotHarness": false,
-    "github.copilot.chat.copilotDebugCommand.enabled": false,
-    "github.copilot.chat.tools.viewImage.enabled": false,
-    "editor.inlineSuggest.edits.allowCodeShifting": "never",
-    "editor.inlineSuggest.edits.renderSideBySide": "never",
-    "editor.inlineSuggest.enabled": false,
-    "python-envs.defaultEnvManager": "ms-python.python:system"
-}
