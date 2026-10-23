@@ -43,7 +43,7 @@
         }
 
         /* ---------- Formularios ---------- */
-        input[type="text"], input[type="number"], select {
+        input[type="text"], input[type="number"], input[type="password"], select {
             width: 100%;
             background-color: var(--fondo);
             border: 1px solid var(--borde);
@@ -319,9 +319,95 @@
         dialog .campo-modal { margin-bottom: 12px; }
         dialog .botones { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
 
+        /* ---------- Login / selector ---------- */
+        [hidden] { display: none !important; }
+        .pantalla-centro { display: flex; justify-content: center; padding-top: 8vh; }
+        .caja-login {
+            background-color: var(--panel);
+            border: 1px solid var(--laton);
+            border-radius: 4px;
+            padding: 22px;
+            width: min(380px, 100%);
+        }
+        .caja-login h2 { margin-top: 0; }
+        .caja-login .campo-modal { margin-bottom: 12px; }
+        .caja-login button[type="submit"] { width: 100%; margin-top: 6px; }
+        .recordar { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--texto-suave); cursor: pointer; }
+        .error-login { color: var(--peligro); font-size: 0.85rem; min-height: 1.2em; margin: 8px 0 0; }
+
+        .selector-lista { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin: 18px 0; }
+        button.persona {
+            position: relative;
+            background-color: var(--panel);
+            color: var(--texto);
+            border: 1px solid var(--borde);
+            border-radius: 4px;
+            padding: 34px 16px;
+            font-size: 1.3rem;
+        }
+        button.persona:hover { border-color: var(--laton); color: var(--laton); filter: none; }
+        .persona-num {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            min-width: 24px;
+            padding: 1px 7px;
+            border-radius: 12px;
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.8rem;
+            background-color: var(--pendiente);
+            color: #1c1a14;
+        }
+        .persona-num.cero { background-color: var(--panel-2); color: var(--pagado); border: 1px solid var(--pagado); }
+
+        .barra-top {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            color: var(--texto-suave);
+        }
+        .barra-top strong { color: var(--laton); font-family: 'Special Elite', cursive, serif; font-weight: 400; }
+
     </style>
 </head>
 <body>
+
+    <section id="pantalla-login" class="pantalla-centro" hidden>
+        <form id="loginForm" class="caja-login">
+            <h2>Iniciar sesión</h2>
+            <div class="campo-modal">
+                <label class="campo" for="loginUsuario">Usuario</label>
+                <input type="text" id="loginUsuario" autocomplete="username" required>
+            </div>
+            <div class="campo-modal">
+                <label class="campo" for="loginClave">Contraseña</label>
+                <input type="password" id="loginClave" autocomplete="current-password" required>
+            </div>
+            <label class="recordar"><input type="checkbox" id="loginRecordar" checked> Mantener sesión iniciada</label>
+            <p id="loginError" class="error-login" role="alert"></p>
+            <button type="submit">Entrar</button>
+        </form>
+    </section>
+
+    <section id="pantalla-selector" hidden>
+        <h2>¿De quién querés ver los préstamos?</h2>
+        <p class="vacio">El número chico es la cantidad de personas que todavía faltan cobrar en <span id="selector-mes"></span>.</p>
+        <div id="selector-lista" class="selector-lista"></div>
+        <button class="sec chico" onclick="cerrarSesion()">Cerrar sesión</button>
+    </section>
+
+    <div id="pantalla-app" hidden>
+
+    <div class="barra-top">
+        <span>Préstamos de <strong id="quien-ve"></strong></span>
+        <span>
+            <button class="sec chico" onclick="mostrarSelector()">Cambiar de persona</button>
+            <button class="peligro chico" onclick="cerrarSesion()">Cerrar sesión</button>
+        </span>
+    </div>
 
     <section class="nuevo">
         <p class="titulo">Registrar nuevo préstamo</p>
@@ -370,6 +456,8 @@
 
     <h2>Préstamos actuales</h2>
     <div id="contenedor-resultados"><p class="mensaje">Cargando…</p></div>
+
+    </div>
 
     <dialog id="modal">
         <form id="modalForm" method="dialog">
@@ -426,13 +514,103 @@
             renderPanel();
         });
 
+        // ---------- Sesión ----------
+        const TOKEN_KEY = "prestamos_token";
+        let tokenMem = null;
+        const DUENOS = [
+            { id: "thiago", nombre: "Thiago" },
+            { id: "nestor", nombre: "Néstor" },
+            { id: "facundo", nombre: "Facundo" }
+        ];
+        let dueno = null;
+        try { dueno = sessionStorage.getItem("prestamos_dueno"); } catch (_) {}
+
+        function getToken() {
+            try { return localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY) || tokenMem; }
+            catch (_) { return tokenMem; }
+        }
+
+        function guardarToken(token, recordar) {
+            tokenMem = token;
+            try { (recordar ? localStorage : sessionStorage).setItem(TOKEN_KEY, token); } catch (_) {}
+        }
+
+        function mostrar(pantalla) {
+            ["pantalla-login", "pantalla-selector", "pantalla-app"].forEach(id => { $(id).hidden = id !== pantalla; });
+        }
+
+        function cerrarSesion() {
+            tokenMem = null;
+            dueno = null;
+            datosCache = [];
+            try { localStorage.removeItem(TOKEN_KEY); sessionStorage.removeItem(TOKEN_KEY); sessionStorage.removeItem("prestamos_dueno"); } catch (_) {}
+            mostrar("pantalla-login");
+        }
+
+        $("loginForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            $("loginError").textContent = "";
+            try {
+                const r = await api("/login", "POST", { usuario: $("loginUsuario").value, clave: $("loginClave").value });
+                guardarToken(r.token, $("loginRecordar").checked);
+                $("loginClave").value = "";
+                mostrarSelector();
+            } catch (err) {
+                $("loginError").textContent = err.message;
+            }
+        });
+
+        async function mostrarSelector() {
+            dueno = null;
+            try { sessionStorage.removeItem("prestamos_dueno"); } catch (_) {}
+            mostrar("pantalla-selector");
+            $("selector-mes").textContent = nombreMes(mesActual());
+            let resumen = {};
+            try { resumen = await api(`/resumen?mes=${mesActual()}`); } catch (_) {}
+            $("selector-lista").innerHTML = DUENOS.map(d => {
+                const n = resumen[d.id];
+                return `<button class="persona" onclick="elegirDueno('${d.id}')">
+                            ${d.nombre}
+                            <span class="persona-num ${n === 0 ? "cero" : ""}" title="Personas que faltan cobrar este mes">${n ?? "–"}</span>
+                        </button>`;
+            }).join("");
+        }
+
+        function elegirDueno(id) {
+            dueno = id;
+            try { sessionStorage.setItem("prestamos_dueno", id); } catch (_) {}
+            $("quien-ve").textContent = DUENOS.find(d => d.id === id).nombre;
+            mostrar("pantalla-app");
+            cargarPrestamos();
+        }
+
+        async function iniciar() {
+            if (!getToken()) { mostrar("pantalla-login"); return; }
+            try {
+                await api("/sesion");
+            } catch (err) {
+                if (getToken()) {  // no fue un 401: el servidor no respondió
+                    mostrar("pantalla-login");
+                    $("loginError").textContent = "No se pudo conectar con el servidor";
+                }
+                return;
+            }
+            if (DUENOS.some(d => d.id === dueno)) elegirDueno(dueno); else mostrarSelector();
+        }
+
         async function api(ruta, metodo = "GET", cuerpo) {
             const opciones = { method: metodo, headers: {} };
+            const token = getToken();
+            if (token) opciones.headers["Authorization"] = "Bearer " + token;
             if (cuerpo !== undefined) {
                 opciones.headers["Content-Type"] = "application/json";
                 opciones.body = JSON.stringify(cuerpo);
             }
             const r = await fetch(`${API_URL}${ruta}`, opciones);
+            if (r.status === 401 && ruta !== "/login") {
+                cerrarSesion();
+                throw new Error("Tu sesión venció. Volvé a iniciar sesión.");
+            }
             if (!r.ok) {
                 let detalle = "Error en el servidor";
                 try { detalle = (await r.json()).detail || detalle; } catch (_) {}
@@ -451,7 +629,8 @@
                     prestado: parseInt($("prestado").value),
                     cantidad_cuotas: parseInt($("cantidad_cuotas").value),
                     cuota_monto: parseInt($("cuota_monto").value),
-                    mes_inicial: parseInt($("mes_inicial").value)
+                    mes_inicial: parseInt($("mes_inicial").value),
+                    dueno: dueno
                 });
                 e.target.reset();
                 $("mes_inicial").value = mesActual();
@@ -465,7 +644,7 @@
         async function cargarPrestamos() {
             const contenedor = $("contenedor-resultados");
             try {
-                datosCache = await api("/prestamos");
+                datosCache = await api(`/prestamos?dueno=${dueno}`);
             } catch (error) {
                 contenedor.innerHTML = '<p class="mensaje">No se pudo conectar con el servidor. ¿Está corriendo uvicorn?</p>';
                 return;
@@ -703,7 +882,7 @@
             cargarPrestamos();
         }
 
-        cargarPrestamos();
+        iniciar();
     </script>
 </body>
 </html>
