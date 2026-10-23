@@ -1,6 +1,7 @@
 [
     {
         "id": "aa6f374b30d047ca8b0d67d23f218cf5",
+        "Dueno": "thiago",
         "Nombre": "Hugo",
         "Apellido": "Migueles",
         "Prestado": 200000,
@@ -36,6 +37,7 @@
     },
     {
         "id": "8312c97d508d4c2490ab25995639e859",
+        "Dueno": "thiago",
         "Nombre": "Ana",
         "Apellido": "licera",
         "Prestado": 52500,
@@ -71,6 +73,7 @@
     },
     {
         "id": "836034d388744c929ddff879916b5008",
+        "Dueno": "thiago",
         "Nombre": "Adrian",
         "Apellido": "Bustamante",
         "Prestado": 400000,
@@ -112,6 +115,7 @@
     },
     {
         "id": "8aaf98bdf28b4507a9b9a6486c5677f9",
+        "Dueno": "thiago",
         "Nombre": "Marina",
         "Apellido": "Lujan",
         "Prestado": 500000,
@@ -147,6 +151,7 @@
     },
     {
         "id": "a531d745215446c88a4aa4bcba5e8fa2",
+        "Dueno": "thiago",
         "Nombre": "Luis",
         "Apellido": "x",
         "Prestado": 150000,
@@ -182,6 +187,7 @@
     },
     {
         "id": "72ec981e612a41ebb8de46652bdec43c",
+        "Dueno": "thiago",
         "Nombre": "Agustin",
         "Apellido": "X",
         "Prestado": 300000,
