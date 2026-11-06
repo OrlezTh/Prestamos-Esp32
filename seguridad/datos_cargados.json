@@ -1,0 +1,200 @@
+[
+    {
+        "id": "aa6f374b30d047ca8b0d67d23f218cf5",
+        "Nombre": "Hugo",
+        "Apellido": "Migueles",
+        "Prestado": 200000,
+        "Cuota_monto": 105000,
+        "Cuotas": [
+            {
+                "Cuota": 1,
+                "Total": 105000,
+                "Pagado": true,
+                "Mes": 7
+            },
+            {
+                "Cuota": 2,
+                "Total": 105000,
+                "Pagado": true,
+                "Mes": 8
+            },
+            {
+                "Cuota": 3,
+                "Total": 105000,
+                "Pagado": true,
+                "Mes": 9
+            },
+            {
+                "Cuota": 4,
+                "Total": 105000,
+                "Pagado": false,
+                "Mes": 10
+            }
+        ],
+        "Cantidad_cuotas": 4,
+        "Monto_total": 420000
+    },
+    {
+        "id": "8312c97d508d4c2490ab25995639e859",
+        "Nombre": "Ana",
+        "Apellido": "licera",
+        "Prestado": 52500,
+        "Cuota_monto": 52500,
+        "Cuotas": [
+            {
+                "Cuota": 1,
+                "Total": 52500,
+                "Pagado": true,
+                "Mes": 9
+            },
+            {
+                "Cuota": 2,
+                "Total": 52500,
+                "Pagado": true,
+                "Mes": 10
+            },
+            {
+                "Cuota": 3,
+                "Total": 52500,
+                "Pagado": false,
+                "Mes": 11
+            },
+            {
+                "Cuota": 4,
+                "Total": 52500,
+                "Pagado": false,
+                "Mes": 12
+            }
+        ],
+        "Cantidad_cuotas": 4,
+        "Monto_total": 210000
+    },
+    {
+        "id": "836034d388744c929ddff879916b5008",
+        "Nombre": "Adrian",
+        "Apellido": "Bustamante",
+        "Prestado": 400000,
+        "Cuota_monto": 168000,
+        "Cuotas": [
+            {
+                "Cuota": 1,
+                "Total": 168000,
+                "Pagado": true,
+                "Mes": 8
+            },
+            {
+                "Cuota": 2,
+                "Total": 168000,
+                "Pagado": true,
+                "Mes": 9
+            },
+            {
+                "Cuota": 3,
+                "Total": 168000,
+                "Pagado": false,
+                "Mes": 10
+            },
+            {
+                "Cuota": 4,
+                "Total": 168000,
+                "Pagado": false,
+                "Mes": 11
+            },
+            {
+                "Cuota": 5,
+                "Total": 168000,
+                "Pagado": false,
+                "Mes": 12
+            }
+        ],
+        "Cantidad_cuotas": 5,
+        "Monto_total": 840000
+    },
+    {
+        "id": "8aaf98bdf28b4507a9b9a6486c5677f9",
+        "Nombre": "Marina",
+        "Apellido": "Lujan",
+        "Prestado": 500000,
+        "Cuota_monto": 269000,
+        "Cuotas": [
+            {
+                "Cuota": 1,
+                "Total": 269000,
+                "Pagado": false,
+                "Mes": 10
+            },
+            {
+                "Cuota": 2,
+                "Total": 269000,
+                "Pagado": false,
+                "Mes": 11
+            },
+            {
+                "Cuota": 3,
+                "Total": 269000,
+                "Pagado": false,
+                "Mes": 12
+            },
+            {
+                "Cuota": 4,
+                "Total": 269000,
+                "Pagado": false,
+                "Mes": 1
+            }
+        ],
+        "Cantidad_cuotas": 4,
+        "Monto_total": 1076000
+    },
+    {
+        "id": "a531d745215446c88a4aa4bcba5e8fa2",
+        "Nombre": "Luis",
+        "Apellido": "x",
+        "Prestado": 150000,
+        "Cuota_monto": 82500,
+        "Cuotas": [
+            {
+                "Cuota": 1,
+                "Total": 82500,
+                "Pagado": true,
+                "Mes": 10
+            },
+            {
+                "Cuota": 2,
+                "Total": 82500,
+                "Pagado": false,
+                "Mes": 11
+            },
+            {
+                "Cuota": 3,
+                "Total": 82500,
+                "Pagado": false,
+                "Mes": 12
+            },
+            {
+                "Cuota": 4,
+                "Total": 82500,
+                "Pagado": false,
+                "Mes": 1
+            }
+        ],
+        "Cantidad_cuotas": 4,
+        "Monto_total": 330000
+    },
+    {
+        "id": "72ec981e612a41ebb8de46652bdec43c",
+        "Nombre": "Agustin",
+        "Apellido": "X",
+        "Prestado": 300000,
+        "Cuota_monto": 450000,
+        "Cuotas": [
+            {
+                "Cuota": 1,
+                "Total": 450000,
+                "Pagado": false,
+                "Mes": 10
+            }
+        ],
+        "Cantidad_cuotas": 1,
+        "Monto_total": 450000
+    }
+]
