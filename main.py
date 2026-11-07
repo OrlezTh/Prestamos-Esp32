@@ -152,6 +152,10 @@ class CuotaEditar(BaseModel):
     mes: Optional[int] = None
 
 
+class CuotaComentario(BaseModel):
+    comentario: str = ""
+
+
 # ---------- Persistencia ----------
 
 PATRON_VIEJO = re.compile(r"Cuota:\s*(\d+)\s+Total:\s*(\d+)\s+Pagado:\s*(True|False)")
@@ -364,6 +368,16 @@ def alternar_pago(prestamo_id: str, cuota_idx: int):
     return {"mensaje": "Estado de cuota actualizado", "Pagado": c["Pagado"]}
 
 
+@privado.patch("/prestamos/{prestamo_id}/cuotas/{cuota_idx}/comentario")
+def comentar_cuota(prestamo_id: str, cuota_idx: int, datos_comentario: CuotaComentario):
+    datos = cargar()
+    p = buscar(datos, prestamo_id)
+    c = validar_cuota(p, cuota_idx)
+    c["Comentario"] = datos_comentario.comentario.strip()
+    guardar(datos)
+    return {"mensaje": "Comentario actualizado", "Comentario": c["Comentario"]}
+
+
 @privado.put("/prestamos/{prestamo_id}/cuotas/{cuota_idx}")
 def editar_cuota(prestamo_id: str, cuota_idx: int, cambios: CuotaEditar):
     validar_mes(cambios.mes)
@@ -393,14 +407,15 @@ app.include_router(privado)
 
 
 @app.get("/thiago_prestamos")
-def home():
+def home_thiago():
     return FileResponse(os.path.join(BASE_DIR, "index.html"))
 
+
 @app.get("/nestor_prestamos")
-def home():
+def home_nestor():
     return FileResponse(os.path.join(BASE_DIR, "index.html"))
+
 
 @app.get("/")
 def home():
     return FileResponse(os.path.join(BASE_DIR, "index.html"))
-               
