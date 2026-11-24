@@ -28,7 +28,7 @@
             {
                 "Cuota": 4,
                 "Total": 105000,
-                "Pagado": false,
+                "Pagado": true,
                 "Mes": 10,
                 "Comentario": "Paga a fin de mes"
             }
@@ -133,7 +133,8 @@
                 "Cuota": 2,
                 "Total": 269000,
                 "Pagado": false,
-                "Mes": 11
+                "Mes": 11,
+                "Comentario": "No pago un orto"
             },
             {
                 "Cuota": 3,
@@ -197,13 +198,99 @@
         "Cuotas": [
             {
                 "Cuota": 1,
-                "Total": 450000,
-                "Pagado": false,
+                "Total": 150000,
+                "Pagado": true,
                 "Mes": 10,
-                "Comentario": "Mes que viene o fines de octubre"
+                "Comentario": "Pago solo 150, diciembre lo demas"
+            },
+            {
+                "Cuota": 2,
+                "Total": 300000,
+                "Pagado": false,
+                "Mes": 12
             }
         ],
-        "Cantidad_cuotas": 1,
+        "Cantidad_cuotas": 2,
         "Monto_total": 450000
+    },
+    {
+        "id": "dfefe3a4f91c4a6cbcb7bc0384b00e69",
+        "Dueno": "thiago",
+        "Nombre": "silvana",
+        "Apellido": "hija jorge",
+        "Prestado": 250000,
+        "Cuota_monto": 133800,
+        "Cuotas": [
+            {
+                "Cuota": 1,
+                "Total": 133800,
+                "Pagado": false,
+                "Mes": 12,
+                "Comentario": "paga l0s 20"
+            },
+            {
+                "Cuota": 2,
+                "Total": 133800,
+                "Pagado": false,
+                "Mes": 1
+            },
+            {
+                "Cuota": 3,
+                "Total": 133800,
+                "Pagado": false,
+                "Mes": 2
+            },
+            {
+                "Cuota": 4,
+                "Total": 133800,
+                "Pagado": false,
+                "Mes": 3
+            }
+        ],
+        "Cantidad_cuotas": 4,
+        "Monto_total": 535200
+    },
+    {
+        "id": "3e6dad670460487e8270a7bc1c4b121c",
+        "Dueno": "thiago",
+        "Nombre": "anita",
+        "Apellido": "x",
+        "Prestado": 300000,
+        "Cuota_monto": 165000,
+        "Cuotas": [
+            {
+                "Cuota": 1,
+                "Total": 165000,
+                "Pagado": false,
+                "Mes": 12,
+                "Comentario": "2 diciembre primera"
+            },
+            {
+                "Cuota": 2,
+                "Total": 165000,
+                "Pagado": false,
+                "Mes": 1
+            },
+            {
+                "Cuota": 3,
+                "Total": 165000,
+                "Pagado": false,
+                "Mes": 2
+            },
+            {
+                "Cuota": 4,
+                "Total": 165000,
+                "Pagado": false,
+                "Mes": 3
+            },
+            {
+                "Cuota": 5,
+                "Total": 165000,
+                "Pagado": false,
+                "Mes": 4
+            }
+        ],
+        "Cantidad_cuotas": 5,
+        "Monto_total": 825000
     }
 ]
